@@ -1,0 +1,335 @@
+// Name        : DSAL_Assignment_01.cpp
+// Author      : The Sarish
+// Version     :
+// Copyright   : Your copyright notice
+// Description : Hello World in C++, Ansi-style
+//============================================================================
+
+// DSAL Assignment-01
+
+/* Q.Beginning with an empty binary tree, Construct binary tree by inserting the values in the order given. After constructing a binary tree perform following operations on it-
+	 Perform inorder / preorder and post order traversal
+	 Change a tree so that the roles of the left and right pointers are swapped at every node
+	 Find the height of tree
+	 Copy this tree to another [operator=]
+	 Count number of leaves, number of internal nodes.
+	 Erase all nodes in a binary tree.
+	 (implement both recursive and non-recursive methods)
+	 1)Create BT
+	 2)Traversals( all 3)
+	 3)swap RST with LST
+	 4)Height of BT
+	 5)count: leaf & internal nodes
+	 6)Copy BT
+	 7)Erase=Delete
+*/
+
+// Date of Assignment - 18-01-2022
+
+#include <iostream>
+using namespace std;
+
+class node
+{
+	int data;
+	node *left;
+	node *right;
+public:
+	node()
+	{
+		left=NULL;
+		right=NULL;
+		data=0;
+	}
+
+	friend class btree;
+};
+
+class btree
+{
+public:
+	node *root;
+
+	btree()
+	{
+		root=NULL;
+	}
+
+	void create()
+	{
+		char val='y';
+		node *p,*temp;
+		while(val=='y')
+		{
+			p = new node();
+			//p=newnode;
+			cout<<"Enter Data: "<<endl;
+			cin>>p->data;
+			if(root==NULL)
+			{
+				root=p;
+			}
+			else
+			{
+				temp=root;
+				int flag=0;
+				while(flag==0)
+				{
+					char choice;
+					cout<<"Want to add "<<p->data<<" to right(r) or left(l) of "<<temp->data<<endl;
+					cin>>choice;
+					if(choice=='l')
+					{
+						if(temp->left==NULL)
+						{
+							temp->left=p;
+							flag=1;
+						}
+						else
+						{
+							temp=temp->left;
+						}
+					}
+					else
+					{
+						if(temp->right==NULL)
+						{
+							temp->right=p;
+							flag=1;
+						}
+						else
+						{
+							temp=temp->right;
+						}
+					}
+				}
+			}
+			cout<<"Do you want to add?(y/n)"<<endl;
+			cin>>val;
+		}
+	}
+
+	void inorder(node*x)
+	{
+		if(x==NULL)
+		{
+			return;
+		}
+		else
+		{
+			inorder(x->left);
+			cout<<x->data<<" ";
+			inorder(x->right);
+		}
+	}
+
+	void preorder(node*x)
+	{
+		if(x==NULL)
+		{
+			return;
+		}
+		else
+		{
+			cout<<x->data<<" ";
+			preorder(x->left);
+			preorder(x->right);
+		}
+	}
+
+	void postorder(node*x)
+	{
+		if(x==NULL)
+		{
+			return;
+		}
+		else
+		{
+			postorder(x->left);
+			postorder(x->right);
+			cout<<x->data<<" ";
+		}
+	}
+
+	int height(node *x)
+	{
+		int leftHeight,rightHeight;
+		if(x==NULL)
+		{
+			return 0;
+		}
+		else
+		{
+			leftHeight=height(x->left);
+			rightHeight=height(x->right);
+
+		}
+		if(leftHeight>rightHeight)
+		{
+			return(leftHeight + 1);
+		}
+		else
+		{
+			return(rightHeight + 1);
+		}
+	}
+
+	int leafCount(node *t){
+	    if(t == NULL)
+	    {
+	    	 return 0;
+	    }
+	    if((t->left == NULL) && (t->right == NULL))
+	    {
+	    	return 1;
+	    }
+	    return leafCount(t->left)+leafCount(t->right);
+	}
+
+	int nonLeafCount(node* root){
+	   if (root == NULL || (root->left == NULL && root->right == NULL)){
+	      return 0;
+	   }
+	   return 1 + nonLeafCount(root->left) + nonLeafCount(root->right);
+	}
+
+	void swapTree(node*x)
+	{
+		if(x==NULL)
+		{
+			return;
+		}
+		else
+		{
+			node*temp=x->left;
+			x->left=x->right;
+			x->right=temp;
+			swapTree(x->left);
+			swapTree(x->right);
+		}
+	}
+
+	node* clone(node* root )
+	{
+		if (root == NULL )
+	    {
+		   return root;
+	    }
+	    else
+	    {
+		   node *temp = new node ;
+		   temp->data = root-> data;    //copying data
+		   temp->left = clone(root -> left);    //cloning left child
+		   temp->right = clone(root -> right);  //cloning right child
+		   return temp;
+	    }
+	}
+
+	void deleteTree(node* temp)
+	{
+	    if (temp == NULL)
+		{
+	    	return;
+		}
+	    /*delete both subtrees */
+	    else
+	    {
+	    	deleteTree(temp->left);
+			deleteTree(temp->right);
+			/* then delete the temp */
+			cout << "\n Deleting temp: " << temp->data;
+			delete temp;
+	    }
+	}
+};
+
+int main() {
+	btree bint,bint2;
+	int choice;
+	bint.create();
+	bool flag=true;
+	while(flag)
+	{
+		cout<<"\n--------MENU--------"<<endl;
+		cout<<"\n1.Tree Traversal\n2.Height\n3.Number of Nodes\n4.Swap Nodes\n5.Copy Tree\n6.Delete Tree\n7.Exit"<<endl;
+		cin>>choice;
+		switch(choice)
+		{
+			case 1:
+			{
+				cout<<"Inorder Traversal: ";
+				bint.inorder(bint.root);
+				cout<<endl;
+				cout<<"Preorder Traversal: ";
+				bint.preorder(bint.root);
+				cout<<endl;
+				cout<<"Postorder Traversal: ";
+				bint.postorder(bint.root);
+				cout<<endl;
+				break;
+			}
+
+			case 2:
+			{
+				cout<<"Height of tree is: "<<bint.height(bint.root)<<endl;
+				break;
+			}
+
+			case 3:
+			{
+				int countLeaf=bint.leafCount(bint.root);
+				cout<<"Number of leaf nodes: "<<countLeaf<<endl;
+				int countNonLeaf=bint.nonLeafCount(bint.root);
+				cout<<"Number of non-leaf nodes: "<<countNonLeaf<<endl;
+				int totalNodes=countLeaf+countNonLeaf;
+				cout<<"Number of total nodes: "<<totalNodes<<endl;
+				break;
+			}
+
+			case 4:
+			{
+				bint.swapTree(bint.root);
+				cout<<"Inorder Traversal after swapping: "<<endl;
+				bint.inorder(bint.root);   								// to retain the original tree swap it again
+				cout<<endl;
+				bint.swapTree(bint.root);
+				cout<<"Inorder Traversal before swapping: "<<endl;
+				bint.inorder(bint.root);
+				break;
+			}
+
+			case 5:
+			{
+				bint2.root=bint.clone(bint.root);
+				cout<<"Inorder Traversal of copied tree: "<<endl;
+				bint2.inorder(bint2.root);
+				cout<<endl;
+				cout<<"Inorder Traversal of original tree: "<<endl;
+				bint.inorder(bint.root);
+				cout<<endl;
+				cout<<"Address of root node of 1st tree: "<<&bint.root<<endl;
+				cout<<"Address of root node of 2nd tree: "<<&bint2.root<<endl;
+				break;
+			}
+
+			case 6:
+			{
+				bint.deleteTree(bint.root);
+				break;
+			}
+
+			case 7:
+			{
+				flag=false;
+				break;
+			}
+
+			default:
+			{
+				cout<<"Enter valid choice"<<endl;
+			}
+
+		}
+	}
+	return 0;
+}
