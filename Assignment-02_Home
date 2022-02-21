@@ -1,0 +1,326 @@
+// Name        : DSAL_Assignment_02.cpp
+// Author      : 
+// Version     :
+// Copyright   : Your copyright notice
+// Description : Hello World in C++, Ansi-style
+//============================================================================
+
+// DSAL Assignment-02
+
+/* Q. A Dictionary stores keywords and its meanings. Provide facility for adding new keywords, deleting keywords, updating values of any entry.
+   Provide facility to display whole data sorted in ascending/ Descending order. Also find how many maximum comparisons may require for finding any keyword.
+   Use Binary Search Tree for implementation.*/
+
+// Date of Assignment - 08-02-2022
+
+#include <iostream>
+using namespace std;
+
+class Node
+{
+public:
+	string key;
+	string meaning;
+	Node* left;
+	Node* right;
+
+	Node(string x, string y)
+	{
+		key=x;
+		meaning=y;
+		left=NULL;
+		right=NULL;
+	}
+	friend class Dictionary;
+};
+
+class Dictionary
+{
+public:
+	Node*root;
+
+	Dictionary()
+	{
+		root=NULL;
+	}
+
+	void insert(Node*, string, string);
+	void displayAscending(Node*);
+	void displayDescending(Node*);
+	void searchWord(Node*, string);
+	void updateMeaning(Node*, string);
+	void deleteWord(Node*, string);
+};
+
+void Dictionary::insert(Node*p, string word, string wordMeaning)
+{
+	if(word<p->key)
+	{
+		if(p->left!=NULL)
+		{
+			insert(p->left, word, wordMeaning);
+		}
+		else
+		{
+			p->left=new Node(word, wordMeaning);
+		}
+	}
+	else
+	{
+		if(p->right!=NULL)
+		{
+			insert(p->right, word, wordMeaning);
+		}
+		else
+		{
+			p->right=new Node(word, wordMeaning);
+		}
+	}
+}
+
+void Dictionary::displayAscending(Node*p)
+{
+	if(p==NULL)
+	{
+		return;
+	}
+	else
+	{
+		displayAscending(p->left);
+		cout<<"\n"<<p->key<<"->"<<p->meaning;
+		displayAscending(p->right);
+	}
+}
+
+void Dictionary::displayDescending(Node*p)
+{
+	if(p==NULL)
+	{
+		return;
+	}
+	else
+	{
+		displayDescending(p->right);
+		cout<<"\n"<<p->key<<"->"<<p->meaning;
+		displayDescending(p->left);
+	}
+}
+
+
+
+void Dictionary::searchWord(Node*p, string wordToSearch)
+{
+	int count=0;
+	while(p!=NULL)                         // to reach end of our path(make sure we explored all options)
+	{
+		if(wordToSearch < p->key)
+		{
+			count++;
+			p=p->left;
+		}
+		else if(wordToSearch > p->key)
+		{
+			count++;
+			p=p->right;
+		}
+		else if(wordToSearch == p->key)
+		{
+			count++;
+			cout<<p->key<<"->"<<p->meaning<<endl;
+			cout<<"Number of comparisons: "<<count<<endl;
+			return;
+		}
+	}
+	count++;
+	cout<<"Word not found"<<endl;
+	cout<<"Number of comparisons: "<<count<<endl;
+}
+
+void Dictionary::updateMeaning(Node*p, string wordToUpdate)
+{
+	string changeMeaning;
+	while(p!=NULL)
+	{
+		if(wordToUpdate < p->key)
+		{
+			p=p->left;
+		}
+		else if(wordToUpdate > p->key)
+		{
+			p=p->right;
+		}
+		else if(wordToUpdate == p->key)
+		{
+			cout<<"Enter the changed meaning: "<<endl;
+			cin>>changeMeaning;
+			p->meaning=changeMeaning;
+			return;
+		}
+	}
+	cout<<"Word not present in dictionary"<<endl;
+}
+
+void Dictionary::deleteWord(Node*p, string wordToDelete)
+{
+	Node* temp;
+	Node* parent;
+	Node* r;
+	while(p!=NULL)
+	{
+		if(wordToDelete < p->key)
+		{
+			parent=p;
+			p=p->left;
+		}
+		else if(wordToDelete > p->key)
+		{
+			parent=p;
+			p=p->right;
+		}
+		else if(wordToDelete == p->key)
+		{
+			if(p->left==NULL && p->right==NULL)
+			{
+				if(p==parent->right)
+				{
+					parent->right=NULL;
+					delete p;
+					return;
+				}
+				else if(p==parent->left)
+				{
+					parent->left=NULL;
+					delete p;
+					return;
+				}
+			}
+			else if(p->left==NULL && p->right!=NULL)
+			{
+				if(p==parent->right)
+				{
+					parent->right=p->right;
+					p->right=NULL;
+					delete p;
+					return;
+				}
+				else if(p==parent->left)
+				{
+					parent->left=p->right;
+					p->right=NULL;
+					delete p;
+					return;
+				}
+
+			}
+			else if(p->left!=NULL && p->right==NULL)
+			{
+				if(p==parent->right)
+				{
+					parent->right=p->left;
+					p->left=NULL;
+					delete p;
+					return;
+				}
+				else if(p==parent->left)
+				{
+					parent->left=p->left;
+					p->left=NULL;
+					delete p;
+					return;
+				}
+			}
+			else if(p->left!=NULL && p->right!=NULL)
+			{
+				r=p->right;
+				while(r!=NULL)
+				{
+					r=r->left;
+				}
+				temp->key=r->key;
+				temp->meaning=r->meaning;
+				parent->right=temp;
+				delete p;
+				return;
+			}
+		}
+	}
+	cout<<"Word not present in dictionary"<<endl;
+}
+
+
+
+int main() {
+	Dictionary d1;
+	string tempWord, tempMeaning;
+	bool loop=true;
+	while(loop)
+	{
+		cout<<"\n----------MENU----------"<<endl;
+		cout<<"1. Insert\n2. Display Ascending\n3. Display Descending\n4. Search a word\n5. Update a word\n6. Delete a word\n7. Exit"<<endl;
+		int choice;
+		cout<<"Enter your choice: "<<endl;
+		cin>>choice;
+		switch(choice)
+		{
+		case 1:
+			int number;
+			cout<<"Enter the number of words you want to enter:"<<endl;
+			cin>>number;
+			for(int i=0;i<number;i++)
+			{
+				cout<<"Enter the word: "<<endl;
+				cin>>tempWord;
+				cout<<"Enter the meaning:"<<endl;
+				cin>>tempMeaning;
+				if(d1.root==NULL)
+				{
+					d1.root=new Node(tempWord, tempMeaning);
+				}
+				else
+				{
+					d1.insert(d1.root, tempWord, tempMeaning);
+				}
+			}
+			break;
+
+		case 2:
+			cout<<"Dictionary in ascending order: "<<endl;
+			d1.displayAscending(d1.root);
+			cout<<endl;
+			break;
+
+		case 3:
+			cout<<"Dictionary in descending order: "<<endl;
+			d1.displayDescending(d1.root);
+			cout<<endl;
+			break;
+
+		case 4:
+			cout<<"Enter the word to searchWord"<<endl;
+			cin>>tempWord;
+			d1.searchWord(d1.root, tempWord);
+			break;
+
+		case 5:
+			cout<<"Enter the word whose meaning you want to updateMeaning: "<<endl;
+			cin>>tempWord;
+			d1.updateMeaning(d1.root, tempWord);
+			break;
+
+		case 6:
+			cout<<"Enter the word you want to delete: "<<endl;
+			cin>>tempWord;
+			d1.deleteWord(d1.root, tempWord);
+			break;
+
+		case 7:
+			loop=false;
+			break;
+
+		default:
+			cout<<"Enter the right choice"<<endl;
+		}
+	}
+
+	return 0;
+}
