@@ -38,11 +38,12 @@ public:
 class Dictionary
 {
 public:
-	Node*root;
+	Node*root, *parent;
 
 	Dictionary()
 	{
 		root=NULL;
+		parent=NULL;
 	}
 
 	void insert(Node*, string, string);
@@ -51,6 +52,7 @@ public:
 	void searchWord(Node*, string);
 	void updateMeaning(Node*, string);
 	void deleteWord(Node*, string);
+	Node* minNode(Node*);
 	Node* delete2Child(Node*, string);
 };
 
@@ -162,11 +164,22 @@ void Dictionary::updateMeaning(Node*p, string wordToUpdate)
 	cout<<"Word not present in dictionary"<<endl;
 }
 
+Node* Dictionary::minNode(Node*p)
+{
+	while(p->left!=NULL)
+	{
+		parent=p;
+		p=p->left;
+	}
+	return p;
+}
+
 void Dictionary::deleteWord(Node*p, string wordToDelete)
 {
-	Node* temp;
-	Node* parent;
-	Node* r;
+	//Node* temp;
+	//Node* parent;
+	//Node* r;
+	//Node* x;
 	while(p!=NULL)
 	{
 		if(wordToDelete < p->key)
@@ -233,9 +246,19 @@ void Dictionary::deleteWord(Node*p, string wordToDelete)
 			}
 			else if(p->left!=NULL && p->right!=NULL)
 			{
-                Node* ptr1=delete2Child(p, wordToDelete);
-                deleteWord(, ptr1->key);
-                return;
+				//Node* ptr1=delete2Child(p, wordToDelete);
+				//cout<<ptr1->key<<ptr1->meaning<<ptr1->left<<ptr1->right<<endl;
+				Node* temp=p->left;
+				parent=p;
+				while(temp->left!=NULL && temp->right!=NULL)
+				{
+					parent=temp;
+					temp=temp->right;
+				}
+				p->key=temp->key;
+				p->meaning=temp->meaning;
+				deleteWord(temp, temp->key);              			 //how do I insert d1.root as parameter here
+				return;
 			}
 		}
 	}
@@ -247,11 +270,10 @@ Node* Dictionary::delete2Child(Node*p, string deleteWord)
     Node* temp=p->left;
     while(temp->left!=NULL && temp->right!=NULL)
     {
+    	parent=temp;
         temp=temp->right;
     }
-    Node*temp2;
-    temp2->key=p->key;
-    temp2->meaning=p->meaning;
+    Node*temp2=new Node(p->key, p->meaning);
     p->key=temp->key;
     p->meaning=temp->meaning;
     temp->key=temp2->key;
