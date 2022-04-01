@@ -1,4 +1,4 @@
-#include <iostream>
+##include <iostream>
 using namespace std;
 
 class Node
@@ -17,6 +17,14 @@ public:
 		rflag=1;
 		lflag=1;
 	}
+	Node()
+	{
+		data=0;
+		left=NULL;
+		right=NULL;
+		rflag=1;
+		lflag=1;
+	}
 	friend class TBST;
 };
 
@@ -24,16 +32,145 @@ class TBST
 {
 public:
 	Node* root, *head;
-
 	TBST()
 	{
-		head=new Node;
+		head=new Node();
 		head->right=head;
 		head->left=head;
 		root=NULL;
 
 	}
 
+	void insert();
+	void inorder();
+	void preorder();
+};
+
+void TBST::insert()
+{
+	Node* temp, *curr;
+	char ch='y';
+	int num;
+	do
+	{
+		cout<<"\nEnter the data : ";
+		cin>>num;
+		curr = new Node(num);
+//		curr->right = NULL;
+//		curr->left = NULL;
+//		curr->lflag = 0;
+//		curr->rflag = 0;
+
+		if(root == NULL)
+		{
+			root = curr;
+			root->right = head;
+			root->left = head;
+			head->left = root;
+			head->lflag = 0;			// lflag=1 indicates thread
+		}
+		else
+		{
+			temp=root;
+			while(1)
+			{
+				if(curr->data<temp->data)
+				{
+					if(temp->lflag==1)
+					{
+						curr->left=temp->left;
+						curr->right=temp;
+						temp->lflag=0;
+						temp->left=curr;
+						break;
+					}
+					else
+					{
+						temp=temp->left;
+					}
+				}
+				else
+				{
+					if(temp->rflag == 1)
+					{
+						curr->right = temp->right;
+						curr->left = temp;
+						temp->rflag= 0;
+						temp->right = curr;
+						break;
+					}
+					else
+					{
+						temp = temp->right;
+					}
+				}
+			}
+		}
+		cout<<"Do you want to continue?"<<endl;
+		cin>>ch;
+	}
+	while(ch=='y');
+}
+
+
+
+void TBST :: preorder()
+{
+	Node* temp;
+	int flag = 0;
+	temp = root;
+	while(temp != head)
+	{
+		if(flag == 0)
+		{
+			cout<<temp->data<< "  ";
+		}
+		if(temp->lflag == 0 && flag == 0)
+		{
+			temp = temp->left;
+		}
+		else if(temp->rflag == 0)
+		{
+			temp = temp->right;
+			flag = 0;
+		}
+		else
+		{
+			temp = temp->right;
+			flag = 1;
+		}
+	}
+	cout<<endl;
+}
+
+int main() {
+	TBST tree;
+	bool loop=1;
+	while(loop)
+	{
+		cout<<"MENU:\n1.Insert\n2.Preorder"<<endl;
+		int choice;
+		cout<<"Enter your choice: "<<endl;
+		cin>>choice;
+		switch(choice)
+		{
+		case 1:
+			tree.insert();
+			break;
+		case 2:
+			tree.preorder();
+			cout<<endl;
+			break;
+		case 3:
+			loop=0;
+			break;
+		default:
+			cout<<"Enter right choice"<<endl;
+		}
+	}
+
+	return 0;
+}
 	void insert();
 	void inorder();
 	void preorder();
