@@ -76,6 +76,7 @@ int main() {
 	while(loop)
 	{
 		cout<<"MENU\n1.Insert\n2.Display\n3.Exit"<<endl;
+		flag=1;
 		cin>>choice;
 		switch(choice)
 		{
