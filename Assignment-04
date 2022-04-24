@@ -6,23 +6,28 @@ class HashTable
 {
 public:
 	string hasharray[10][2];
-	int hashFunction(int);
+	int hashFunction(long int);
 	void insertWOR(int, int, string);
+	void display();
+
+	HashTable()
+	{
+		for(int i=0;i<10;i++)
+		{
+			hasharray[i][0]="0";
+			hasharray[i][1]="0";
+		}
+	}
 };
 
-int HashTable::hashFunction(int val)
+int HashTable::hashFunction(long int val)
 {
-	for(int i=0;i<9;i++)
-	{
-		hasharray[i][1]="0";
-		hasharray[i][2]="0";
-	}
-	int sum,m;
+	int sum=0,m;
 	while(val>0)
 	{
 		m=val%10;
 		sum=sum+m;
-		val=val%10;
+		val=val/10;
 	}
 	return sum%10;
 }
@@ -30,11 +35,11 @@ int HashTable::hashFunction(int val)
 void HashTable::insertWOR(int address, int number, string name)
 {
 	int i=address;
-	string num= (string)number;
-	if(hasharray[address][1]=="0")
+	string num= to_string(number);
+	if(hasharray[address][0]=="0")
 	{
-		hasharray[address][1]=num;
-		hasharray[address][2]=name;
+		hasharray[address][0]=num;
+		hasharray[address][1]=name;
 	}
 	else
 	{
@@ -46,14 +51,67 @@ void HashTable::insertWOR(int address, int number, string name)
 			}
 			else
 			{
-				i=0;
+				i=0;     // to move to the first position after reaching last position
 			}
 		}
-		insertWOR(i, num, name);
+		int num2=stoi(num);
+		insertWOR(i, num2, name);
 	}
 }
 
-int main() {
+void HashTable::display()
+{
+	for(int i=0;i<10;i++)
+	{
+		cout<<hasharray[i][0]<<":"<<hasharray[i][1]<<endl;
+	}
+}
 
+
+int main() {
+	HashTable h1;
+	bool loop=true;
+	int choice, pn, val, flag=1;
+	string name;
+	while(loop)
+	{
+		cout<<"MENU\n1.Insert\n2.Display\n3.Exit"<<endl;
+		cin>>choice;
+		switch(choice)
+		{
+			case 1:
+			{
+				while(flag==1)
+				{
+					cout<<"Enter phone number: "<<endl;
+					cin>>pn;
+					cout<<"Enter name: "<<endl;
+					cin>>name;
+					val=h1.hashFunction(pn);
+					h1.insertWOR(val, pn, name);
+					cout<<"Do you want to add?(0/1)"<<endl;
+					cin>>flag;
+				}
+				break;
+			}
+
+			case 2:
+			{
+				h1.display();
+				break;
+			}
+
+			case 3:
+			{
+				loop=false;
+				break;
+			}
+
+			default:
+			{
+				cout<<"Enter right choice"<<endl;
+			}
+		}
+	}
 	return 0;
 }
