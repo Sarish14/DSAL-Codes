@@ -1,4 +1,4 @@
-##include <iostream>
+#include <iostream>
 using namespace std;
 
 class Node
@@ -8,6 +8,7 @@ class Node
 	Node*right;
 	int rflag;
 	int lflag;
+
 public:
 	Node(int i)
 	{
@@ -38,12 +39,16 @@ public:
 		head->right=head;
 		head->left=head;
 		root=NULL;
-
 	}
-
 	void insert();
 	void inorder();
 	void preorder();
+	Node *find_successor(Node *current);
+	Node *find_predecessor(Node *current);
+	void delete_node(Node *root, int val);
+	Node *case_A(Node *root, Node *parent, Node *current);
+	Node *case_B(Node *root, Node *parent, Node *current);
+	Node *case_C(Node *root, Node *parent, Node *current);
 };
 
 void TBST::insert()
@@ -67,7 +72,7 @@ void TBST::insert()
 			root->right = head;
 			root->left = head;
 			head->left = root;
-			head->lflag = 0;			// lflag=1 indicates thread
+			head->lflag = 0;			// lflag=1 indicates thread i.e. left child is not present
 		}
 		else
 		{
@@ -78,10 +83,10 @@ void TBST::insert()
 				{
 					if(temp->lflag==1)
 					{
-						curr->left=temp->left;
-						curr->right=temp;
-						temp->lflag=0;
-						temp->left=curr;
+						curr->left=temp->left;       // setting the threads
+						curr->right=temp;			 // setting the threads
+						temp->lflag=0;				// lflag is set to 0 coz now them has a left child
+						temp->left=curr;			// finally, curr node is set as temp's left child
 						break;
 					}
 					else
@@ -112,43 +117,223 @@ void TBST::insert()
 	while(ch=='y');
 }
 
-
-
 void TBST :: preorder()
 {
-	Node* temp;
-	int flag = 0;
-	temp = root;
-	while(temp != head)
+	Node* temp=root;
+	while(temp!=head)
 	{
-		if(flag == 0)
+		while(temp->lflag!=1)
 		{
-			cout<<temp->data<< "  ";
+			cout<<temp->data<<' ';
+			temp=temp->left;
 		}
-		if(temp->lflag == 0 && flag == 0)
+		cout<<temp->data<<' ';
+		while(temp->rflag==1)
 		{
-			temp = temp->left;
+			temp=temp->right;           // using thread
+			if(temp==head)
+			{
+				return;
+			}
 		}
-		else if(temp->rflag == 0)
-		{
-			temp = temp->right;
-			flag = 0;
-		}
-		else
-		{
-			temp = temp->right;
-			flag = 1;
-		}
+		temp=temp->right;
 	}
-	cout<<endl;
+}
+
+void TBST :: inorder()
+{
+	Node* temp=root;
+	while(temp!=head)
+	{
+		while(temp->lflag!=1)
+		{
+			temp=temp->left;
+		}
+		cout<<temp->data<<' ';
+		while(temp->rflag==1)
+		{
+			temp=temp->right;
+			if(temp==head)
+			{
+				return;
+			}
+			cout<<temp->data<<' ';
+		}
+		temp=temp->right;
+	}
+}
+
+Node* TBST::find_successor(Node *current)
+{
+    if (current->rflag == 1)
+    {
+        return current->right;
+    }
+    else
+    {
+        current = current->right;
+        while (current->lflag == 0)
+        {
+            current = current->left;
+        }
+        return current;
+    }
+}
+Node* TBST ::find_predecessor(Node *current)
+{
+    if (current->lflag == 1)
+    {
+        return current->left;
+    }
+    else
+    {
+        current = current->left;
+        while (current->rflag == 0)
+        {
+            current = current->right;
+        }
+        return current;
+    }
+}
+void TBST ::delete_node(Node *root, int val)
+{
+    Node *current = root;
+    Node *parent = NULL;
+    bool found = false;
+    while (current != NULL)
+    {
+        if (val == current->data)
+        {
+            found = true;
+            break;
+        }
+        parent = current;
+        if (val < current->data)
+        {
+            if (current->lflag == 0)
+                current = current->left;
+            else
+                break;
+        }
+        else
+        {
+            if (current->rflag == 0)
+                current = current->right;
+            else
+                break;
+        }
+    }
+    if (found == false)
+    {
+        cout << val << " is not present in this Threaded Binary Tree" << endl;
+    }
+    else if (current->lflag == 0 && current->rflag == 0)
+    {
+        root = case_C(root, parent, current);
+    }
+    else if (current->lflag== 0)
+    {
+        root = case_B(root, parent, current);
+    }
+    else if (current->rflag == 0)
+    {
+        root = case_B(root, parent, current);
+    }
+    else
+    {
+        root = case_A(root, parent, current);
+    }
+}
+
+Node *TBST::case_A(Node *root, Node *parent, Node *current)
+{
+    if (parent == NULL)
+    {
+        root = NULL;
+    }
+    else if (current == parent->left)
+    {
+        parent->lflag = 1;
+        parent->left = current->left;
+    }
+    else
+    {
+        parent->rflag= 1;
+        parent->right = current->right;
+    }
+    cout << current->data << " successfully deleted" << endl;
+    delete current;
+    return root;
+}
+Node *TBST::case_B(Node *root, Node *parent, Node *current)
+{
+    Node *child, *s, *p;
+    if (current->lflag == 0)
+    {
+        child = current->left;
+    }
+    else
+    {
+        child = current->right;
+    }
+    if (parent == NULL)
+    {
+        root = child;
+    }
+    else if (current == parent->left)
+    {
+        parent->left = child;
+    }
+    else
+    {
+        parent->right = child;
+    }
+    s = find_successor(current);
+    p = find_predecessor(current);
+    if (current->lflag == 0)
+    {
+        p->right = s;
+    }
+    else
+    {
+        if (current->rflag == 0)
+        {
+            s->left = p;
+        }
+    }
+    cout << current->data << " successfully deleted" << endl;
+    delete current;
+    return root;
+}
+Node *TBST ::case_C(Node *root, Node *parent, Node *current)
+{
+    Node *succ, *parsucc;
+    parsucc = current;
+    succ = current->right;
+    while (succ->left != NULL)
+    {
+        parsucc = succ;
+        succ = succ->left;
+    }
+    current->data = succ->data;
+    if (succ->lflag == 1 && succ->rflag == 1)
+    {
+        root = case_A(root, parsucc, succ);
+    }
+    else
+    {
+        root = case_B(root, parsucc, succ);
+    }
+    return root;
 }
 
 int main() {
 	TBST tree;
+	int value;
 	bool loop=1;
 	while(loop)
 	{
-		cout<<"MENU:\n1.Insert\n2.Preorder"<<endl;
+		cout<<"MENU:\n1.Insert\n2.Preorder\n3.Inorder\n4.Delete"<<endl;
 		int choice;
 		cout<<"Enter your choice: "<<endl;
 		cin>>choice;
@@ -162,6 +347,15 @@ int main() {
 			cout<<endl;
 			break;
 		case 3:
+			tree.inorder();
+			cout<<endl;
+			break;
+		case 4:
+			cout<<"Enter value you want to delete: "<<endl;
+			cin>>value;
+			tree.delete_node(tree.root, value);
+			break;
+		case 5:
 			loop=0;
 			break;
 		default:
@@ -169,121 +363,5 @@ int main() {
 		}
 	}
 
-	return 0;
-}
-	void insert();
-	void inorder();
-	void preorder();
-};
-
-void TBST::insert()
-{
-	Node* temp, curr;
-	char ch='y';
-	int num;
-	do
-	{
-		cout<<"\n Enter the data : ";
-		cin>>num;
-		curr = new Node(num);
-//		curr->right = NULL;
-//		curr->left = NULL;
-//		curr->lflag = 0;
-//		curr->rflag = 0;
-
-		if(root == NULL)
-		{
-			root = curr;
-			root->right = head;
-			root->left = head;
-			head->left = root;
-			head->lflag = 0;			// lflag=1 indicates thread
-		}
-		else
-		{
-			temp=root;
-			while(1)
-			{
-				if(curr->data<temp->data)
-				{
-					if(temp->lflag==1)
-					{
-						curr->left=temp->left;
-						curr->right=temp;
-						temp->lflag=0;
-						temp->left=curr;
-						break;
-					}
-					else
-					{
-						temp=temp->left;
-					}
-				}
-				else
-				{
-					if(temp->rflag == 1)
-					{
-						curr->right = temp->right;
-						curr->left = temp;
-						temp->rflag= 0;
-						temp->right = curr;
-						break;
-					}
-					else
-					{
-						temp = temp->right;
-					}
-				}
-			}
-		}
-	}
-	cout<<"Do you want to continue?"<<endl;
-	cin>>ch;
-	while(ch=='y');
-}
-
-void TBST :: preorder()
-{
-	Node* temp;
-	int flag = 0;
-	temp = root;
-	while(temp != head)
-	{
-		if(flag == 0)
-		{
-			cout<<temp->data<< "  ";
-		}
-		if(temp->lflag == 0 && flag == 0)
-		{
-			temp = temp->left;
-		}
-		else if(temp->rflag == 0)
-		{
-			temp = temp->right;
-			flag = 0;
-		}
-		else
-		{
-			temp = temp->right;
-			flag = 1;
-		}
-	}
-}
-
-int main() {
-	TBST tree;
-	cout<<"MENU:\n1.Insert\n2.Inorder"<<endl;
-	int choice;
-	cout<<"Enter your choice: "<<endl;
-	cin>>choice;
-	switch(choice)
-	{
-	case 1:
-		tree.insert();
-		break;
-	case 2:
-		tree.preorder();
-		break;
-	}
 	return 0;
 }
