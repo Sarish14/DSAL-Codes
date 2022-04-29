@@ -1,0 +1,132 @@
+#include <iostream>
+using namespace std;
+
+class Node
+{
+	Node* next;
+	Node* down;
+	int data;
+	int visited;
+
+public:
+	Node()
+	{
+		next=NULL;
+		down=NULL;
+		data=0;
+		visited=0;
+	}
+
+	Node(int value)
+	{
+		next=NULL;
+		down=NULL;
+		data=value;
+		visited=0;
+	}
+
+	friend class Graph;
+};
+
+class Graph
+{
+public:
+	Node* head;
+
+	Graph()
+	{
+		head=NULL;
+	}
+
+	void create(int);
+	void DFS(int);
+};
+
+void Graph::create(int vertices)
+{
+	Node* temp, *temp2;
+	int number, choice;
+	while(vertices!=0)
+	{
+		if(head==NULL)
+		{
+			head=new Node();
+		}
+		else
+		{
+			temp2=head;
+			Node* temp=new Node();
+			temp2->down=temp;
+			temp2=temp;
+		}
+		vertices--;
+	}
+	temp=head;
+	while(temp!=NULL)
+	{
+		cout<<temp->data;
+		cout<<"Enter data: "<<endl;
+		cin>>number;
+		temp->data=number;
+		temp2=temp;
+		int loop=1;
+		while(loop==1)
+		{
+			cout<<"Do you want to add adjacent node to "<<temp->data<<"(0/1)"<<endl;
+			cin>>choice;
+			if(choice==1)
+			{
+				Node* temp3=new Node();
+				temp2->next=temp3;
+				cout<<"Enter adjacent vertex"<<endl;
+				cin>>number;
+				temp3->data=number;
+				temp2=temp2->next;
+			}
+			else
+			{
+				loop=0;
+			}
+		}
+		temp=temp->down;
+	}
+}
+
+void Graph::DFS(int source)
+{
+	Node* temp;
+	temp=head;
+	while(temp->data!=source)
+	{
+		temp=temp->down;
+	}
+	if(temp->visited==0)
+	{
+		cout<<temp->data<<" ";
+		temp->visited=1;
+		temp=temp->next;
+		DFS(temp->data);
+	}
+}
+
+int main() {
+	Graph g;
+	int choice, v;
+	cout<<"\nMENU\n1.Create\n2.DFS\n3.BFS"<<endl;
+	cin>>choice;
+	switch(choice)
+	{
+	case 1:
+		cout<<"Enter number of vertices: "<<endl;
+		cin>>v;
+		g.create(v);
+		break;
+
+	case 2:
+		cout<<"Enter source node: "<<endl;
+		cin>>v;
+		g.DFS(v);
+		break;
+	}
+	return 0;
+}
