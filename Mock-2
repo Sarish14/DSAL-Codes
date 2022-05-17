@@ -1,0 +1,295 @@
+/============================================================================
+// Name        : 21345_Mock-2_Assignment-02.cpp
+// Author      : 
+// Version     :
+// Copyright   : Your copyright notice
+// Description : Hello World in C++, Ansi-style
+//============================================================================
+// traverse, height, swap, leafnode, internal node
+// DSAL Mock Exam
+// Sarish Inamdar
+// Roll Number: 21345
+
+#include <iostream>
+using namespace std;
+
+class Node
+{
+	int data;
+	Node* left;
+	Node* right;
+
+public:
+	Node()
+	{
+		data=-999;
+		left=right=NULL;
+	}
+
+	Node(int value)
+	{
+		data=value;
+		left=right=NULL;
+	}
+
+	friend class BinaryTree;
+};
+
+class BinaryTree
+{
+public:
+	Node* root;
+
+	BinaryTree()
+	{
+		root=NULL;
+	}
+
+	void create();
+	void inorder(Node*);
+	void preorder(Node*);
+	void postorder(Node*);
+	void swap(Node*);
+	int height(Node*);
+	int leafCount(Node*);
+	int internalCount(Node*);
+};
+
+void BinaryTree::create()
+{
+	int number, loop=1;
+	char choice;
+	Node* temp, *p;
+	while(loop==1)
+	{
+		cout<<"Enter data: "<<endl;
+		cin>>number;
+		p=new Node(number);
+		if(root==NULL)
+		{
+			root=p;
+		}
+		else
+		{
+			temp=root;
+			int flag=1;
+			while(flag==1)
+			{
+				cout<<"Enter "<<number<<" to left or right of "<<temp->data<<":"<<endl;
+				cin>>choice;
+				if(choice=='l')
+				{
+					if(temp->left==NULL)
+					{
+						temp->left=p;
+						flag=0;
+					}
+					else
+					{
+						temp=temp->left;
+					}
+				}
+				else
+				{
+					if(temp->right==NULL)
+					{
+						temp->right=p;
+						flag=0;
+					}
+					else
+					{
+						temp=temp->right;
+					}
+				}
+			}
+		}
+		cout<<"\nWant to enter more?(1/0)"<<endl;
+		cin>>loop;
+	}
+}
+
+void BinaryTree::inorder(Node* p)
+{
+	if(p==NULL)
+	{
+		return;
+	}
+	else
+	{
+		inorder(p->left);
+		cout<<p->data<<" ";
+		inorder(p->right);
+	}
+}
+
+void BinaryTree::preorder(Node* p)
+{
+	if(p==NULL)
+	{
+		return;
+	}
+	else
+	{
+		cout<<p->data<<" ";
+		preorder(p->left);
+		preorder(p->right);
+	}
+}
+
+void BinaryTree::postorder(Node* p)
+{
+	if(p==NULL)
+	{
+		return;
+	}
+	else
+	{
+		postorder(p->left);
+		postorder(p->right);
+		cout<<p->data<<" ";
+	}
+}
+
+void BinaryTree::swap(Node* p)
+{
+	if(p==NULL)
+	{
+		return;
+	}
+	else
+	{
+		Node* temp=p->left;
+		p->left=p->right;
+		p->right=temp;
+		swap(p->left);
+		swap(p->right);
+	}
+}
+
+int BinaryTree::height(Node* p)
+{
+	int leftHeight, rightHeight;
+	if(p==NULL)
+	{
+		return 0;
+	}
+	else
+	{
+		leftHeight=height(p->left);
+		rightHeight=height(p->right);
+	}
+	if(leftHeight>rightHeight)
+	{
+		return(leftHeight+1);
+	}
+	else
+	{
+		return(rightHeight+1);
+	}
+}
+
+int BinaryTree::leafCount(Node* p)
+{
+	if(p==NULL)
+	{
+		return 0;
+	}
+	if(p->left==NULL && p->right==NULL)
+	{
+		return 1;
+	}
+	//else
+	//{
+		//leftCount=leafCount(p->left);
+		//rightCount=leafCount(p->right);
+	//}
+	return(leafCount(p->left)+leafCount(p->right));
+}
+
+int BinaryTree::internalCount(Node* p)
+{
+	if(p==NULL)
+	{
+		return 0;
+	}
+	int r=internalCount(p->left)+internalCount(p->right);
+	if(p->left!=NULL || p->right!=NULL)
+	{
+		return(r + 1);
+	}
+	else
+	{
+		return(r);
+	}
+}
+
+int main()
+{
+	BinaryTree b1;
+	int loop2=1, choice, val;
+	while(loop2==1)
+	{
+		cout<<"\nMENU\n1. Create\n2. Inorder\n3. Preorder\n4. Postorder\n5. Swap\n6. Height\n7. Leaf Count\n8. Internal Nodes\n9. Exit"<<endl;
+		cout<<"\nEnter your choice: "<<endl;
+		cin>>choice;
+		switch(choice)
+		{
+		case 1:
+			b1.create();
+			break;
+
+		case 2:
+			cout<<"Inorder traversal: "<<endl;
+			b1.inorder(b1.root);
+			cout<<endl;
+			break;
+
+		case 3:
+			cout<<"Preorder traversal:"<<endl;
+			b1.preorder(b1.root);
+			cout<<endl;
+			break;
+
+		case 4:
+			cout<<"Postorder Traversal: "<<endl;
+			b1.postorder(b1.root);
+			cout<<endl;
+			break;
+
+		case 5:
+			cout<<"Original inorder traversal: "<<endl;
+			b1.inorder(b1.root);
+			cout<<"\nInorder traversal after swapping: "<<endl;
+			b1.swap(b1.root);
+			b1.inorder(b1.root);
+			b1.swap(b1.root);
+			break;
+
+		case 6:
+			cout<<"Height of tree:"<<endl;
+			val=b1.height(b1.root);
+			cout<<val<<endl;
+			break;
+
+		case 7:
+			cout<<"Number of leaf nodes:"<<endl;
+			val=b1.leafCount(b1.root);
+			cout<<val<<endl;
+			break;
+
+		case 8:
+			cout<<"Number of internal nodes:"<<endl;
+			val=b1.internalCount(b1.root);
+			cout<<val<<endl;
+			break;
+
+		case 9:
+			loop2=0;
+			break;
+
+		default:
+			cout<<"Enter right choice"<<endl;
+		}
+	}
+	return 0;
+}
